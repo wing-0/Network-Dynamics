@@ -3,3 +3,7 @@
 *.pdf
 *.doc
 *.docx
+
+# Matlab stuff #
+################
+*.asv
