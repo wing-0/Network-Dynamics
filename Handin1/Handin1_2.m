@@ -60,23 +60,24 @@ fprintf('%-20.0f %-10.2f\n',[users(max5) y(max5)]')
 
 %% b) Discrete-time consensus algorithm
 
+close all
+
 % Set stubborn and regular nodes.
 s0 = 22;
 s1 = 270;
 stubborn = [s0 s1];
 regular = setdiff(1:n, stubborn);
 
-% Create matrices Q, R and S. P = [Q R; zeros S]
+% Create matrices Q and R. P = [Q R; zeros S]
 Q = P(regular,regular);
 R = P(regular,stubborn);
-S = P(stubborn,stubborn);
 
 % Set number of time steps to run for
-steps = 300;
+steps = 500;
 
 % Set opinion values for nodes. s0 = 0, s1 = 1, others 0
 x = zeros(n,steps);
-x(stubborn,1) = [0,1];
+x(stubborn,1) = [0 1];
 
 % Iterate for the prescribed number of time steps
 for k = 2:steps
@@ -87,36 +88,78 @@ for k = 2:steps
     x(stubborn,k) = x(stubborn,k-1);
 end
 
-% Plot how opinions change for some nodes
-nodes = randperm(n,20)';
-plot(x(nodes,:)');
-legend(string(nodes))
+% Split the PageRank range into three equal bins (size of each bin is
+% (max(y)-min(y))/3. Randomly pick three regular nodes from each bin and 
+%store their indices
+ysplit = (max(y)-min(y))/3;
+
+high = find(y > max(y)-ysplit);
+high = high(randperm(length(high),3));
+high = setdiff(high,stubborn);
+
+med = find(y > min(y)+ysplit & y < max(y)-ysplit & y~=s0 & y~=s1);
+med = med(randperm(length(med),3));
+med = setdiff(med,stubborn);
+
+low = find(y < min(y) + ysplit & y~=s0 & y~=s1);
+low = low(randperm(length(low),3));
+low = setdiff(low,stubborn);
+
+% Plot the opinions over time. Use different lines for different bins
+figure
+hold on
+plot(x(high,:)','-');
+plot(x(med,:)','--');
+plot(x(low,:)',':');
+leg = legend(string([high;med;low]));
+title(leg,'Node index')
+title(sprintf('Opinions over time\nStubborn nodes: %4.0f (value 0), %4.0f (value 1)',...
+    s0,s1))
+xlabel('Timestep')
+ylabel('Opinion (0-1)')
 
 %% b) Discrete-time consensus algorithm with PageRank considerations
 
-% Set pairs of stubborn nodes. s0 = 0, s1 = 1
-% TODO: find good nodes
-s0 = [1 2];
-s1 = [2 1];
+close all
 
-for k = 1:length(s0)
+% Split the PageRank range into three equal bins (size of each bin is
+% (max(y)-min(y))/3. Randomly pick two nodes from each bin and store their
+% indices. 2 nodes each so that simulations can be run for two stubborn
+% nodes from the same bin
+ysplit = (max(y)-min(y))/3;
+high = find(y > max(y)-ysplit);
+high = high(randperm(length(high),2));
+med = find(y > min(y)+ysplit & y < max(y)-ysplit);
+med = med(randperm(length(med),2));
+low = find(y < min(y) + ysplit);
+low = low(randperm(length(low),2));
+
+
+
+% Set pairs of stubborn nodes. s0 = 0, s1 = 1
+% Scenarios: combination of high PR, med PR, low PR
+s0 = [high(1) high(1) high(1) med(1) med(1) med(1) low(1) low(1) low(1)];
+s1 = [high(2) med(1) low(1) high(1) med(2) low(1) high(1) med(1) low(2)];
+
+
+% Iterate over all PageRank scenarios
+for k = 1:size(s0,2)
     
     % Set stubborn and regular nodes.
     stubborn = [s0(k) s1(k)];
     regular = setdiff(1:n, stubborn);
     
-    % Create matrices Q, R and S. P = [Q R; zeros S]
+    % Create matrices Q and R. P = [Q R; zeros S]
     Q = P(regular,regular);
     R = P(regular,stubborn);
-    S = P(stubborn,stubborn);
     
     % Set opinion values for nodes. s0 = 0, s1 = 1, others 0
     x = zeros(n,1);
-    x(stubborn) = [0,1];
+    x(stubborn) = [0 1];
     xold = inf*ones(n,1);
     
     % Iterate until opinions have converged sufficiently
-    while find(abs(x-xold) > 1e-6)
+    while (sum(abs(x-xold) > 1e-6) > 0)
         
         % Update regular nodes according to opinion dynamics with stubborn
         % nodes using P split up into Q, R and S.
@@ -128,6 +171,11 @@ for k = 1:length(s0)
     % Plot opinion distribution as a histogram
     figure
     hist(x,10)
+    ylim([0 7000])
+    title(sprintf('Opinion distribution\nPageRank of stubborn nodes: %3.2f (value 0), %3.2f (value 1)',...
+        y(s0(k)),y(s1(k))))
+    xlabel('Opinion (0-1)')
+    ylabel('Number of nodes')
 
 end
 
