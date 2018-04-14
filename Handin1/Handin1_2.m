@@ -11,15 +11,8 @@ Wa = spconvert(twitter);
 % Number of nodes
 n = max(size(Wa));
 
-% Make W into a square matrix. 'users' is of size 6893x1, which indicates
-% that W should be 6893x6893 instead of the given 6893x6881. By inspecting
-% the 'twitter' matrix it can be found that the highest index for a tail
-% node is 6893. However, the highest index for a head node is 6881. From
-% this it can be concluded that the nodes with indices between 6881 and
-% 6893 have no links heading towards them, and have therefore been excluded
-% from W due to the sparse format. To include them and make W square as it
-% should be, all zero columns should be added at the right end of W to make
-% it 6893x6893.
+% Make W into a square matrix by adding all zero columns at the right end 
+% of W to make it 6893x6893.
 W = sparse(n,n);
 W(1:size(Wa,1),1:size(Wa,2)) = Wa;
 

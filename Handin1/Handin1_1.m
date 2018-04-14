@@ -6,16 +6,17 @@ close all
 % Load data from file
 load IOdownload.mat
 
-% Select data from sets 'bra2000', 'can2000', swe2000' and store in a cell.
+% Select data from sets 'can2000', swe2000' and store in a cell.
 % The index of the name in 'sets' is the same as for the weight
 % matrix in 'W'
-sets = econ([5 6 34]);
-W = {getfield(io,sets{1}), getfield(io,sets{2}), getfield(io,sets{3})};
+sets = econ([6 34]);
+W = {getfield(io,sets{1}), getfield(io,sets{2})};
 
 %% a) Rank sectors using in-degree and out-degree centrality
 
 % Iterate over the three datasets
-for k = 1:3
+for k = 1:length(sets)
+    
     fprintf('Dataset ''%s''\n',sets{k})
     
     % Calculate in-degree centrality and extract the indices for the
@@ -25,9 +26,9 @@ for k = 1:3
     
     % Print results
     fprintf('\tMost central sectors (in-degree)\n')
-    fprintf('\t\t%-70s (%1.2f)\n',name{max3(1)},ic(max3(1)))
-    fprintf('\t\t%-70s (%1.2f)\n',name{max3(2)},ic(max3(2)))
-    fprintf('\t\t%-70s (%1.2f)\n',name{max3(3)},ic(max3(3)))
+    fprintf('\t\t%-70s %1.0f\n',name{max3(1)},ic(max3(1)))
+    fprintf('\t\t%-70s %1.0f\n',name{max3(2)},ic(max3(2)))
+    fprintf('\t\t%-70s %1.0f\n',name{max3(3)},ic(max3(3)))
     
     % Calculate out-degree centrality and extract the indices for the
     % three most central sectors
@@ -36,9 +37,9 @@ for k = 1:3
     
     % Print results
     fprintf('\tMost central sectors (out-degree)\n')
-    fprintf('\t\t%-70s (%1.2f)\n',name{max3(1)},oc(max3(1)))
-    fprintf('\t\t%-70s (%1.2f)\n',name{max3(2)},oc(max3(2)))
-    fprintf('\t\t%-70s (%1.2f)\n',name{max3(3)},oc(max3(3)))
+    fprintf('\t\t%-70s %1.0f\n',name{max3(1)},oc(max3(1)))
+    fprintf('\t\t%-70s %1.0f\n',name{max3(2)},oc(max3(2)))
+    fprintf('\t\t%-70s %1.0f\n',name{max3(3)},oc(max3(3)))
     
     fprintf('\n')
     
@@ -47,7 +48,7 @@ end
 %% b) Rank sectors using eigenvector centrality
 
 % Iterate over the three datasets
-for k = 1:3
+for k = 1:length(sets)
     fprintf('Dataset ''%s''\n',sets{k})
     
     % Calculate the dominant eigenvalue of weight matrix
@@ -68,9 +69,9 @@ for k = 1:3
     
     % Print results
     fprintf('\tMost central sectors (eigenvector)\n')
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(1)},ec(max3(1)))
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(2)},ec(max3(2)))
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(3)},ec(max3(3)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(1)},ec(max3(1)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(2)},ec(max3(2)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(3)},ec(max3(3)))
     
     fprintf('\n')
 end
@@ -78,7 +79,7 @@ end
 %% c) Rank sectors using Katz centrality
 
 % Iterate over the three datasets
-for k = 1:3
+for k = 1:length(sets)
     fprintf('Dataset ''%s''\n',sets{k})
     
     % Set first values for beta and mu
@@ -98,9 +99,9 @@ for k = 1:3
     
     % Print results
     fprintf('\tMost central sectors (Katz w/ mu = 1 everywhere)\n')
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(1)},kc(max3(1)))
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(2)},kc(max3(2)))
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(3)},kc(max3(3)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(1)},kc(max3(1)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(2)},kc(max3(2)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(3)},kc(max3(3)))
     
     % Change mu so that it is 1 for "Wholesale & retail trade; repairs"
     % and 0 for all others
@@ -116,9 +117,9 @@ for k = 1:3
     
     % Print results
     fprintf('\tMost central sectors (Katz w/ mu = 1 for Wholesale...)\n')
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(1)},kc(max3(1)))
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(2)},kc(max3(2)))
-    fprintf('\t\t%-70s (%1.4f)\n',name{max3(3)},kc(max3(3)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(1)},kc(max3(1)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(2)},kc(max3(2)))
+    fprintf('\t\t%-70s %1.3f\n',name{max3(3)},kc(max3(3)))
     
     fprintf('\n')
     
