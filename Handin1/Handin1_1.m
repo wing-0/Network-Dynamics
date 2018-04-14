@@ -1,4 +1,5 @@
 %% Initialize
+%--------------------------------------------------------------------------
 
 clearvars
 close all
@@ -12,7 +13,9 @@ load IOdownload.mat
 sets = econ([6 34]);
 W = {getfield(io,sets{1}), getfield(io,sets{2})};
 
+%--------------------------------------------------------------------------
 %% a) Rank sectors using in-degree and out-degree centrality
+%--------------------------------------------------------------------------
 
 % Iterate over the three datasets
 for k = 1:length(sets)
@@ -45,7 +48,9 @@ for k = 1:length(sets)
     
 end
 
+%--------------------------------------------------------------------------
 %% b) Rank sectors using eigenvector centrality
+%--------------------------------------------------------------------------
 
 % Iterate over the three datasets
 for k = 1:length(sets)
@@ -76,7 +81,9 @@ for k = 1:length(sets)
     fprintf('\n')
 end
 
+%--------------------------------------------------------------------------
 %% c) Rank sectors using Katz centrality
+%--------------------------------------------------------------------------
 
 % Iterate over the three datasets
 for k = 1:length(sets)

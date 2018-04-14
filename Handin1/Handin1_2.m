@@ -1,4 +1,5 @@
 %% Initialize
+%--------------------------------------------------------------------------
 
 clearvars
 close all
@@ -24,7 +25,9 @@ P = D\W;
 % entries as W, so NaN's are numerical errors and should really be zeros
 P(isnan(P)) = 0;
 
+%--------------------------------------------------------------------------
 %% a) PageRank
+%--------------------------------------------------------------------------
 
 % Define parameters according to PageRank standard
 beta = 0.15;
@@ -51,7 +54,9 @@ fprintf('Five most central users:\n')
 fprintf('%-20s %-10s\n','User ID','PageRank centrality')
 fprintf('%-20.0f %-10.2f\n',[users(max5) y(max5)]')
 
+%--------------------------------------------------------------------------
 %% b) Discrete-time consensus algorithm
+%--------------------------------------------------------------------------
 
 close all
 
@@ -111,7 +116,9 @@ title(sprintf('Opinions over time\nStubborn nodes: %4.0f (value 0), %4.0f (value
 xlabel('Timestep')
 ylabel('Opinion (0-1)')
 
+%--------------------------------------------------------------------------
 %% b) Discrete-time consensus algorithm with PageRank considerations
+%--------------------------------------------------------------------------
 
 close all
 
