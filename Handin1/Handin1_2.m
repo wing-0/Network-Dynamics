@@ -71,10 +71,10 @@ Q = P(regular,regular);
 R = P(regular,stubborn);
 
 % Set number of time steps to run for
-steps = 500;
+steps = 1000;
 
-% Set opinion values for nodes. s0 = 0, s1 = 1, others 0
-x = zeros(n,steps);
+% Set opinion values for nodes. s0 = 0, s1 = 1, others random 0-1
+x = rand(n,steps);
 x(stubborn,1) = [0 1];
 
 % Iterate for the prescribed number of time steps
@@ -153,8 +153,8 @@ for k = 1:size(s0,2)
     Q = P(regular,regular);
     R = P(regular,stubborn);
     
-    % Set opinion values for nodes. s0 = 0, s1 = 1, others 0
-    x = zeros(n,1);
+    % Set opinion values for nodes. s0 = 0, s1 = 1, others random 0-1
+    x = rand(n,1);
     x(stubborn) = [0 1];
     xold = inf*ones(n,1);
     
