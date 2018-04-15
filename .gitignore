@@ -7,3 +7,10 @@
 # Matlab stuff #
 ################
 *.asv
+
+# Image stuff #
+###############
+*.jpg
+*.png
+*.eps
+*.fig
