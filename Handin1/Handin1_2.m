@@ -58,8 +58,6 @@ fprintf('%-20.0f %-10.2f\n',[users(max5) y(max5)]')
 %% b) Discrete-time consensus algorithm
 %--------------------------------------------------------------------------
 
-close all
-
 % Set stubborn and regular nodes.
 s0 = 22;
 s1 = 270;
@@ -117,10 +115,8 @@ xlabel('Timestep')
 ylabel('Opinion (0-1)')
 
 %--------------------------------------------------------------------------
-%% b) Discrete-time consensus algorithm with PageRank considerations
+%% c) Discrete-time consensus algorithm with PageRank considerations
 %--------------------------------------------------------------------------
-
-close all
 
 % Split the PageRank range into three equal bins (size of each bin is
 % (max(y)-min(y))/3. Randomly pick two nodes from each bin and store their
