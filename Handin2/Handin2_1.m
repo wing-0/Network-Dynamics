@@ -24,14 +24,14 @@ n = 50000;
 % Cumulative sum of the transition probs for a node
 cumprob = cumsum(P,2);
 
-% Array for saving the nodes at each step m = 1:n. First node is node 1,
+% Array for saving the nodes at each step m = 1:n. First node is node 2,
 % but due to the size of the simulation and the memoryless property of the
 % Markov chain the result should be similar regardless of the starting node
 node = zeros(n,1);
-node(1) = 1;
+node(1) = 2;
 
-% Timestamp - particle arrives at node(n) at time t(n) and leaves
-% node(n) at t(n+1) (assume instantaneous travel to the next node)
+% Timestamp - particle arrives at node(m) at time t(m) and leaves
+% node(m) at t(m+1) (assume instantaneous travel to the next node)
 t = zeros(n+1,1);
 
 % Time the particle should stay at the starting node - using weight of
@@ -59,19 +59,14 @@ end
 % Timestamp for when the particle leaves the final node
 t(n+1) = t(n) + tnext;
 
-% Finding return time estimates for all nodes
-treturn = zeros(size(Lambda,1),1);
-for k = 1:size(Lambda,1)
-    
-    % Timestamps for when the particle is at node k
-    tk = t(node==k);
-    
-    % Time between the timestamps, averaging for return time estimate
-    treturn(k) = mean(diff(tk));
-end
+% Finding return time estimate for node a (index 2)
+% Timestamps for when the particle is at node 2
+tk = t(node==2);
 
-fprintf('%14s %24s \n', 'Starting node', 'Return time estimate')
-fprintf('%14.0f %24.2f \n',[ (1:size(Lambda,1))' treturn]')
+% Time between the timestamps, averaging for return time estimate
+treturn = mean(diff(tk));
+
+fprintf('Return time (node a): %1.2f \n',treturn)
 
 %% b) Theoretical return time
 
@@ -91,8 +86,7 @@ pibar = Pi./w/sum(Pi./w);
 % Theoretical return time 1/pibar_i/w_i
 treturn_th = 1./pibar./w;
 
-fprintf('%14s %24s %24s \n', 'Starting node', 'Return time estimate', 'Theoretical return time')
-fprintf('%14.0f %24.2f %24.2f \n',[ (1:size(Lambda,1))' treturn treturn_th]')
+fprintf('Theoretical return time (node a): %1.2f \n',treturn_th(2))
 
 %% c) Hitting time (using simulation from a))
 
@@ -131,6 +125,8 @@ end
 
 % Mean value of the non-NaN times giving the hitting time estimate
 t_hit = mean(t_od(~isnan(t_od)));
+
+fprintf('Hitting time (nodes o-d): %1.2f \n',t_hit)
 
 %% c) Theoretical hitting time
 lb = zeros(5,1);
