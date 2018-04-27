@@ -19,7 +19,7 @@ P = diag(w)\Lambda;
 %% a) Return time
 
 % Steps to run the simulations for
-n = 50000;
+n = 20000;
 
 % Cumulative sum of the transition probs for a node
 cumprob = cumsum(P,2);
@@ -61,10 +61,10 @@ t(n+1) = t(n) + tnext;
 
 % Finding return time estimate for node a (index 2)
 % Timestamps for when the particle is at node 2
-tk = t(node==2);
+ta = t(node==2);
 
 % Time between the timestamps, averaging for return time estimate
-treturn = mean(diff(tk));
+treturn = mean(diff(ta));
 
 fprintf('Return time (node a): %1.2f \n',treturn)
 
