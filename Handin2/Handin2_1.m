@@ -104,10 +104,8 @@ for k = 1:size(ind_o,1)-1
     hits_d = ind_d(ind_d > ind_o(k) & ind_d < ind_o(k+1));
     
     % Save the time difference between the first d-hit from above, and
-    % o-hit k. NaN if no d-hits between o-hit k and o-hit k+1
-    if(isempty(hits_d))
-        t_od(k) = NaN;
-    else
+    % o-hit k (if there are d-hits)
+    if(~isempty(hits_d))
         t_od(k) = t(hits_d(1)) - t(ind_o(k));
     end
 end
@@ -116,10 +114,8 @@ end
 hits_d = ind_d(ind_d > ind_o(end));
 
 % Save the time difference between the first d-hit from above, and the last
-% o-hit . NaN if no d-hits after the last o-hit
-if(isempty(hits_d))
-    t_od(end) = NaN;
-else
+% o-hit (if there are d-hits)
+if(~isempty(hits_d))
     t_od(end) = t(hits_d(1)) - t(ind_o(end));
 end
 
@@ -129,16 +125,12 @@ t_hit = mean(t_od(~isnan(t_od)));
 fprintf('Hitting time (nodes o-d): %1.2f \n',t_hit)
 
 %% c) Theoretical hitting time
-lb = zeros(5,1);
 
-ub = Inf*ones(5,1);
-ub(5) = 0;
+% Equation in theorem 4.2(v) can be written as t_i^s = wn + Pn*t_i^s where
+% wn and Pn are as below
+Pn = P(1:4,1:4);
+wn = 1./w(1:4);
+t_hit_th = (eye(4)-Pn)\wn;
 
-t_hit_th = lsqlin(eye(5)-P,1./w,[],[],[],[],lb,ub);
-
-% Correcter solution for node 1 was given for parameters:
-% lb = -Inf*ones(5,1); lb(5) = 0
-% Although, this gave negative values for nodes 2-4
-
-
+fprintf('Theoretical hitting time (nodes o-d): %1.2f \n',t_hit_th(1))
 

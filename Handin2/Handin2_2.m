@@ -90,7 +90,79 @@ fprintf('Average return time (node a): %1.2f \n',treturn_avg)
 
 %% b) Node perspective
 
+% Number of time units to run simulation for
+tmax = 60;
 
+% Cumulative sum of the transition probs for a node
+cumprob = cumsum(P,2);
+
+% Vector for the times of Poisson ticks (any node). Preallocating for 10000
+% ticks, but actual number may vary
+t = NaN(10000,1);
+t(1) = 0;
+
+% Number of particles in each node at each timestep, initialized with 100
+% particles in node o (index 1) at time t = 0
+nump = NaN(size(t,1),size(P,2));
+nump(1,:) = zeros(1,size(P,2));
+nump(1,1) = 100;
+
+% Index corresponding to time
+k = 1;
+
+% Set time until the next tick for all nodes
+tnext = -log(rand(1,size(P,2)))./nump(k,:)./w';
+
+% Time stepping
+while t(k) + min(tnext) < tmax
+    
+    % Increase time index and set time for the tick to come
+    k = k+1;
+    t(k) = t(k-1) + min(tnext);
+    
+    % Set the number of particles in nodes to be equal to the previous time
+    nump(k,:) = nump(k-1,:);
+    
+    % Find the node with the least time until tick
+    ticknode = find(tnext==min(tnext));
+    
+    % Cumulative transition probs for the ticking node
+    c = cumprob(ticknode,:);
+    
+    % Use a uniform random number to select the node to move a particle to
+    movenode = find(c > rand(),1);
+    
+    % Change particle numbers for the two selected nodes
+    nump(k,ticknode) = nump(k,ticknode)-1;
+    nump(k,movenode) = nump(k,movenode)+1;
+    
+    % Draw new time until the next tick for all nodes. Exponential
+    % distribution is memoryless, so the time until next tick is still
+    % exponentially distributed (though the rate could be changed by moving
+    % particles)
+    tnext = -log(rand(1,size(P,2)))./nump(k,:)./w';
+    
+end
+
+% Truncate matrices so they only have the size of the actual number of
+% Poisson ticks
+t = t(1:k);
+nump = nump(1:k,:);
+
+% Calculate average number of particles in nodes at the end of the
+% simulation (last 5% of the ticks)
+nump_end = nump(ceil(0.95*k):k,:);
+nump_avg = mean(nump_end,1);
+nump_std = std(nump_end,1);
+
+fprintf('%10s %20s \n','Node index','Avg. particles in node at end')
+fprintf('%10.0f %20.2f \n',[1:5; nump_avg])
+
+% Plotting
+plot(t,nump)
+xlabel('Time')
+ylabel('Number of particles')
+legend(['Node o';'Node a';'Node b';'Node c';'Node d'])
 
 
 
