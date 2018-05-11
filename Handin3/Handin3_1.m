@@ -115,6 +115,8 @@ fprintf('\t%-6s %-10s %-10s %-10s \n','Link','SO flow', 'UO flow', 'UO w/tolls')
 fprintf('\t%-6.0f %-10.0f %-10.0f %-10.0f \n',[(1:size(B,2))' f_so f_uo f_t]')
 fprintf('--------------------------------------------------------------\n')
 
+%% g) - Total additional delay
+
 
 
 
