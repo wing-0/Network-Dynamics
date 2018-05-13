@@ -175,7 +175,7 @@ for k = 2:iter
     
     % Update node colors
     set(h,'CData',map(x(k,:),:))
-%     pause(0.001)
+    pause(0.001)
 end
 
 % Plot potential
