@@ -1,28 +1,29 @@
-%% Part 1 - Epidemic on a symmetric k-regular graph
 clearvars
 close all
 
-% Generate k-regular graph with n=500, k=4
+% Generate a random graph with avg degree 6 and 500 nodes
 n = 500;
-W = zeros(n);
-W = W + diag(ones(n-1,1),1); % add ones on the +1 off-diagonal
-W = W + diag(ones(n-1,1),-1); % add ones on the -1 off-diagonal
-W = W + diag(ones(n-2,1),2); % add ones on the +2 off-diagonal
-W = W + diag(ones(n-2,1),-2); % add ones on the -2 off-diagonal
-W = W + diag(ones(1,1),n-1); % add ones on the +n-1 off-diagonal
-W = W + diag(ones(1,1),1-n); % add ones on the -n+1 off-diagonal
-W = W + diag(ones(2,1),n-2); % add ones on the +n-2 off-diagonal
-W = W + diag(ones(2,1),2-n); % add ones on the -n+2 off-diagonal
-W = sparse(W); % transform it into a sparse matrix
+W = generate_graph(6,n);
 
-% Define states Susceptible, Infected, Recovered
+% Plot the graph
+figure
+plot(graph(W),'Layout','force')
+
+% Define states Susceptible, Infected, Recovered, Vaccinated
 S = 0;
 I = 1;
 R = 2;
+V = 3;
 
 % Define infection and recovery probabilities
 beta = 0.3;
 rho = 0.7;
+
+% Vaccination scheme
+vacc = [0; 5; 15; 25; 35; 45; 55; 60; 60; 60; 60; 60; 60; 60; 60];
+
+% Number of individuals to vaccinate in the beginning of each week
+vacc_n = [0; diff(vacc)]/100*n;
 
 % Select patient zero's. This is done by randomly selecting 10 individuals
 pz = randperm(n,10);
@@ -35,6 +36,8 @@ n_epi = 15;
 m_susc = zeros(1,n_epi);
 m_infc = zeros(1,n_epi);
 m_rec = zeros(1,n_epi);
+m_vacc = zeros(1,n_epi);
+
 % Simulate 100 epidemics
 for k = 1:n_iter
     
@@ -44,6 +47,15 @@ for k = 1:n_iter
     
     % Simulate 15 week epidemic
     for t = 1:n_epi-1
+        
+        % Perform vaccination according to scheme. Individuals are selected
+        % randomly from the population that has not yet been vaccinated.
+        % Vaccinated individuals are no longer in susceptible, infected or 
+        % recovered state but instead in a vaccinated state which they
+        % cannot leave
+        novacc = find(X(:,t) ~= V);
+        vaccinate = randperm(length(novacc),vacc_n(t));
+        X(novacc(vaccinate),t) = V;
         
         % Carry over from previous timestep
         X(:,t+1) = X(:,t);
@@ -75,21 +87,27 @@ for k = 1:n_iter
     m_susc = m_susc + sum(X==S,1);
     m_infc = m_infc + sum(X==I,1);
     m_rec = m_rec + sum(X==R,1);
+    m_vacc = m_vacc + sum(X==V,1);
 end
 
 % Calculate mean values by dividing by the number of simulations
 m_susc = m_susc./n_iter;
 m_infc = m_infc./n_iter;
 m_rec = m_rec./n_iter;
+m_vacc = m_vacc./n_iter;
 
 % Line color definition
 c_S = [167,0,255]./255;
 c_I = [255,39,0]./255;
 c_R = [0,189,0]./255;
+c_V = [0,214,255]./255;
 
-% Plot avg number of newly infected each week
+% Plot avg number of newly infected and newly vaccinated each week
 figure
+hold on
 plot(1:n_epi,[10 -diff(m_susc)],'Color',c_I)
+plot(1:n_epi,[0 diff(m_vacc)],'Color',c_V)
+legend('Infected','Vaccinated')
 xlabel('Week')
 ylabel('Number of individuals')
 xlim([1 n_epi])
@@ -101,62 +119,9 @@ hold on
 plot(1:n_epi,m_susc,'Color',c_S)
 plot(1:n_epi,m_infc,'Color',c_I)
 plot(1:n_epi,m_rec,'Color',c_R)
-legend('Susceptible','Infected','Recovered','Location','East')
+plot(1:n_epi,m_vacc,'Color',c_V)
+legend('Susceptible','Infected','Recovered','Vaccinated','Location','East')
 xlabel('Week')
 ylabel('Number of individuals')
 xlim([1 n_epi])
 xticks(1:n_epi)
-
-%% Part 2 - Generate random graph
-clearvars
-close all
-
-% Properties of the final graph
-n = 900;
-k = 2;
-
-% Initial graph (complete graph with k0 nodes)
-k0 = k + 1;
-W = ones(k0) - diag(ones(k0,1));
-W = sparse(W);
-
-% Add nodes from k0+1 to n
-for m = k0+1:n
-    
-    % Set degree c of the new node. To ensure avg degree of k even for odd
-    % k, c is set to floor or ceil of k/2 every other iteration
-    if mod(m,2)==0
-        c = floor(k/2);
-    else
-        c = ceil(k/2);
-    end
-    
-    % Out-degree vector
-    w = sum(W,2);
-    
-    % Probability of adding links
-    p = w./sum(w);
-    
-    % Select c neighbors
-    for j = 1:c
-        
-        % Select neighbor, and remove that neighbor from the population to
-        % choose from
-        neigh = randsample(k0,1,true,full(p));
-        p(neigh) = 0;
-        % Add link (both directions)
-        W(k0+1,neigh) = 1;
-        W(neigh,k0+1) = 1;
-    end
-    
-    % Increase k0
-    k0 = k0 + 1;
-end
-
-% Plot graph using force layout
-G = graph(W);
-plot(G,'Layout','force')
-
-
-
-

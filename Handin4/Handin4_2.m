@@ -1,19 +1,13 @@
-%% Part 1 - Epidemic on a symmetric k-regular graph
 clearvars
 close all
 
-% Generate k-regular graph with n=500, k=4
+% Generate a random graph with avg degree 6 and 500 nodes
 n = 500;
-W = zeros(n);
-W = W + diag(ones(n-1,1),1); % add ones on the +1 off-diagonal
-W = W + diag(ones(n-1,1),-1); % add ones on the -1 off-diagonal
-W = W + diag(ones(n-2,1),2); % add ones on the +2 off-diagonal
-W = W + diag(ones(n-2,1),-2); % add ones on the -2 off-diagonal
-W = W + diag(ones(1,1),n-1); % add ones on the +n-1 off-diagonal
-W = W + diag(ones(1,1),1-n); % add ones on the -n+1 off-diagonal
-W = W + diag(ones(2,1),n-2); % add ones on the +n-2 off-diagonal
-W = W + diag(ones(2,1),2-n); % add ones on the -n+2 off-diagonal
-W = sparse(W); % transform it into a sparse matrix
+W = generate_graph(6,n);
+
+% Plot the graph
+figure
+plot(graph(W),'Layout','force')
 
 % Define states Susceptible, Infected, Recovered
 S = 0;
@@ -35,6 +29,7 @@ n_epi = 15;
 m_susc = zeros(1,n_epi);
 m_infc = zeros(1,n_epi);
 m_rec = zeros(1,n_epi);
+
 % Simulate 100 epidemics
 for k = 1:n_iter
     
@@ -106,57 +101,3 @@ xlabel('Week')
 ylabel('Number of individuals')
 xlim([1 n_epi])
 xticks(1:n_epi)
-
-%% Part 2 - Generate random graph
-clearvars
-close all
-
-% Properties of the final graph
-n = 900;
-k = 2;
-
-% Initial graph (complete graph with k0 nodes)
-k0 = k + 1;
-W = ones(k0) - diag(ones(k0,1));
-W = sparse(W);
-
-% Add nodes from k0+1 to n
-for m = k0+1:n
-    
-    % Set degree c of the new node. To ensure avg degree of k even for odd
-    % k, c is set to floor or ceil of k/2 every other iteration
-    if mod(m,2)==0
-        c = floor(k/2);
-    else
-        c = ceil(k/2);
-    end
-    
-    % Out-degree vector
-    w = sum(W,2);
-    
-    % Probability of adding links
-    p = w./sum(w);
-    
-    % Select c neighbors
-    for j = 1:c
-        
-        % Select neighbor, and remove that neighbor from the population to
-        % choose from
-        neigh = randsample(k0,1,true,full(p));
-        p(neigh) = 0;
-        % Add link (both directions)
-        W(k0+1,neigh) = 1;
-        W(neigh,k0+1) = 1;
-    end
-    
-    % Increase k0
-    k0 = k0 + 1;
-end
-
-% Plot graph using force layout
-G = graph(W);
-plot(G,'Layout','force')
-
-
-
-

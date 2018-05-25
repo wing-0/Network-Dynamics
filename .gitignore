@@ -4,6 +4,10 @@
 *.doc
 *.docx
 
+# Compressed archives #
+#######################
+*.zip
+
 # Matlab stuff #
 ################
 *.asv
