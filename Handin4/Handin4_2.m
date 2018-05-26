@@ -1,13 +1,8 @@
 clearvars
 close all
 
-% Generate a random graph with avg degree 6 and 500 nodes
+% Population
 n = 500;
-W = generate_graph(6,n);
-
-% Plot the graph
-figure
-plot(graph(W),'Layout','force')
 
 % Define states Susceptible, Infected, Recovered
 S = 0;
@@ -17,9 +12,6 @@ R = 2;
 % Define infection and recovery probabilities
 beta = 0.3;
 rho = 0.7;
-
-% Select patient zero's. This is done by randomly selecting 10 individuals
-pz = randperm(n,10);
 
 % Number of epidemics to simulate, and how many weeks each
 n_iter = 100;
@@ -32,6 +24,13 @@ m_rec = zeros(1,n_epi);
 
 % Simulate 100 epidemics
 for k = 1:n_iter
+    
+    % Generate a random graph with avg degree 6 and n nodes
+    W = generate_graph(6,n);
+    
+    % Select patient zero's. This is done by randomly selecting 10
+    % individuals
+    pz = randperm(n,10);
     
     % Initialize epidemic (pz's have state I, others S)
     X = zeros(n,n_epi);

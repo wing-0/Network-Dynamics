@@ -1,13 +1,8 @@
 clearvars
 close all
 
-% Generate a random graph with avg degree 6 and 500 nodes
+% Population
 n = 500;
-W = generate_graph(6,n);
-
-% Plot the graph
-figure
-plot(graph(W),'Layout','force')
 
 % Define states Susceptible, Infected, Recovered, Vaccinated
 S = 0;
@@ -25,9 +20,6 @@ vacc = [0; 5; 15; 25; 35; 45; 55; 60; 60; 60; 60; 60; 60; 60; 60];
 % Number of individuals to vaccinate in the beginning of each week
 vacc_n = [0; diff(vacc)]/100*n;
 
-% Select patient zero's. This is done by randomly selecting 10 individuals
-pz = randperm(n,10);
-
 % Number of epidemics to simulate, and how many weeks each
 n_iter = 100;
 n_epi = 15;
@@ -38,12 +30,25 @@ m_infc = zeros(1,n_epi);
 m_rec = zeros(1,n_epi);
 m_vacc = zeros(1,n_epi);
 
+% Newly infected each week (mean)
+n_infc = zeros(1,n_epi);
+
 % Simulate 100 epidemics
 for k = 1:n_iter
+    
+    % Generate a random graph with avg degree 6 and n nodes
+    W = generate_graph(6,n);
+    
+    % Select patient zero's. This is done by randomly selecting 10
+    % individuals
+    pz = randperm(n,10);
     
     % Initialize epidemic (pz's have state I, others S)
     X = zeros(n,n_epi);
     X(pz,1) = I;
+    
+    % Add the 10 first infected to mean
+    n_infc(1) = n_infc(1) + 10;
     
     % Simulate 15 week epidemic
     for t = 1:n_epi-1
@@ -76,6 +81,9 @@ for k = 1:n_iter
         change = rand(n,1) < prob;
         X(change & susc,t+1) = I;
         
+        % Add to the mean value of newly infected
+        n_infc(t+1) = n_infc(t+1) + sum(change & susc);
+        
         % If a random number is smaller than the recovery probability for
         % an infected individual, change its state from I to R. Individuals
         % infected in this timestep are not considered
@@ -95,6 +103,7 @@ m_susc = m_susc./n_iter;
 m_infc = m_infc./n_iter;
 m_rec = m_rec./n_iter;
 m_vacc = m_vacc./n_iter;
+n_infc = n_infc./n_iter;
 
 % Line color definition
 c_S = [167,0,255]./255;
@@ -105,7 +114,7 @@ c_V = [0,214,255]./255;
 % Plot avg number of newly infected and newly vaccinated each week
 figure
 hold on
-plot(1:n_epi,[10 -diff(m_susc)],'Color',c_I)
+plot(1:n_epi,n_infc,'Color',c_I)
 plot(1:n_epi,[0 diff(m_vacc)],'Color',c_V)
 legend('Infected','Vaccinated')
 xlabel('Week')
@@ -113,7 +122,8 @@ ylabel('Number of individuals')
 xlim([1 n_epi])
 xticks(1:n_epi)
 
-% Plot avg total number of susceptible, infected and recovered each week
+% Plot avg total number of susceptible, infected, recovered and vaccinted
+% each week
 figure
 hold on
 plot(1:n_epi,m_susc,'Color',c_S)
