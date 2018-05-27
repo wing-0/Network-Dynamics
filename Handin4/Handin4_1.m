@@ -1,4 +1,3 @@
-%% Part 1 - Epidemic on a symmetric k-regular graph
 clearvars
 close all
 
@@ -24,9 +23,6 @@ R = 2;
 beta = 0.3;
 rho = 0.7;
 
-% Select patient zero's. This is done by randomly selecting 10 individuals
-pz = randperm(n,10);
-
 % Number of epidemics to simulate, and how many weeks each
 n_iter = 100;
 n_epi = 15;
@@ -37,6 +33,10 @@ m_infc = zeros(1,n_epi);
 m_rec = zeros(1,n_epi);
 % Simulate 100 epidemics
 for k = 1:n_iter
+    
+    % Select patient zero's. This is done by randomly selecting 10
+    % individuals
+    pz = randperm(n,10);
     
     % Initialize epidemic (pz's have state I, others S)
     X = zeros(n,n_epi);
@@ -107,55 +107,6 @@ ylabel('Number of individuals')
 xlim([1 n_epi])
 xticks(1:n_epi)
 
-%% Part 2 - Generate random graph
-clearvars
-close all
-
-% Properties of the final graph
-n = 900;
-k = 2;
-
-% Initial graph (complete graph with k0 nodes)
-k0 = k + 1;
-W = ones(k0) - diag(ones(k0,1));
-W = sparse(W);
-
-% Add nodes from k0+1 to n
-for m = k0+1:n
-    
-    % Set degree c of the new node. To ensure avg degree of k even for odd
-    % k, c is set to floor or ceil of k/2 every other iteration
-    if mod(m,2)==0
-        c = floor(k/2);
-    else
-        c = ceil(k/2);
-    end
-    
-    % Out-degree vector
-    w = sum(W,2);
-    
-    % Probability of adding links
-    p = w./sum(w);
-    
-    % Select c neighbors
-    for j = 1:c
-        
-        % Select neighbor, and remove that neighbor from the population to
-        % choose from
-        neigh = randsample(k0,1,true,full(p));
-        p(neigh) = 0;
-        % Add link (both directions)
-        W(k0+1,neigh) = 1;
-        W(neigh,k0+1) = 1;
-    end
-    
-    % Increase k0
-    k0 = k0 + 1;
-end
-
-% Plot graph using force layout
-G = graph(W);
-plot(G,'Layout','force')
 
 
 
