@@ -221,14 +221,10 @@ while refined < 3
     plot(1:n_epi,I0(2:end),'b')
     hold on
     plot(1:n_epi,n_infc,'r')
-    legend('True','Simulation')
-    xlabel('Week')
-    ylabel('Number of infected individuals')
-    xlim([1 n_epi])
-    xticks(1:n_epi)
-    xticklabels(week(2:end))
     pause(0.1)
 end
+
+fprintf('Simulations finished! \n')
 
 % Plot avg number of newly infected (simulated) and the true value each
 % week
@@ -236,9 +232,9 @@ figure
 hold on
 plot(1:n_epi,I0(2:end),'b')
 plot(1:n_epi,n_infc,'r')
-legend('True','Simulation')
+legend('True','Simulation avg.')
 xlabel('Week')
-ylabel('Number of infected individuals')
+ylabel('Number of newly infected individuals')
 xlim([1 n_epi])
 xticks(1:n_epi)
 xticklabels(week(2:end))
@@ -256,7 +252,7 @@ xlabel('Week')
 ylabel('Number of individuals')
 xlim([1 n_epi])
 xticks(1:n_epi)
-
+xticklabels(week(2:end))
 
 
 
