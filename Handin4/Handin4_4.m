@@ -67,15 +67,15 @@ while refined < 3
     % 2 <= k <= n-1
     % 0 <= beta <= 1
     % 0 <= rho <= 1
-    k = [2 + (k0-d_k > 0)*(k0-d_k - 2); 
+    k = [2 + (k0-d_k >= 2)*(k0-d_k - 2); 
          k0;
-         n-1 + (k0+d_k < n)*(k0+d_k - n+1)];
-    beta = [(beta0-d_beta > 0)*(beta0-d_beta);
+         n-1 + (k0+d_k <= n-1)*(k0+d_k - n+1)];
+    beta = [(beta0-d_beta >= 0)*(beta0-d_beta);
             beta0;
-            (beta0+d_beta < 1)*(beta0+d_beta)];
-    rho = [(rho0-d_rho > 0)*(rho0-d_rho);
+            (beta0+d_beta <= 1)*(beta0+d_beta)];
+    rho = [(rho0-d_rho >= 0)*(rho0-d_rho);
            rho0;
-           (rho0+d_rho < 1)*(rho0+d_rho)];
+           (rho0+d_rho <= 1)*(rho0+d_rho)];
     
     % Parameter vectors for all combinations of parameters in the
     % parameter space. In total there are 27 combinations
